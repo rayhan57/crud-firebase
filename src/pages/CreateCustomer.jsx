@@ -3,6 +3,8 @@ import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { useNavigate } from "react-router-dom";
 import { createCustomer } from "../utils/customerData";
+import { formatDate } from "../utils/formatDate";
+import Alert from "../components/Alert";
 
 const CreateCustomer = () => {
   const navigate = useNavigate();
@@ -14,12 +16,9 @@ const CreateCustomer = () => {
     email: "",
     address: "",
   });
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const phoneNumberIsValid = formData.phoneNumber.length > 10;
-
-  const formatDate = (date) => {
-    const [year, month, day] = date.split("-");
-    return `${day}.${month}.${year}`;
-  };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -40,7 +39,11 @@ const CreateCustomer = () => {
       email: formData.email,
       address: formData.address,
     };
-    createCustomer(customer, () => navigate("/"));
+    createCustomer(customer, () => {
+      setShowAlert(true);
+      setAlertMessage("Customer created successfully");
+      setTimeout(() => navigate("/"), 3000);
+    });
   };
 
   return (
@@ -138,6 +141,11 @@ const CreateCustomer = () => {
           </button>
         </div>
       </form>
+      <Alert
+        showAlert={showAlert}
+        setShowAlert={setShowAlert}
+        alertMessage={alertMessage}
+      />
     </div>
   );
 };

@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
-import SearchCustomers from "../components/SearchCustomers";
 import ButtonCreateCustomers from "../components/ButtonCreateCustomers";
-import CustomerCard from "../components/CustomersCard";
 import ConfirmModal from "../components/ConfirmModal";
+import CustomerCard from "../components/CustomersCard";
 import EditModal from "../components/EditModal";
-import { deleteCustomer, getCustomers } from "../utils/customerData";
+import SearchCustomers from "../components/SearchCustomers";
+import {
+  deleteCustomer,
+  getCustomers,
+  updateCustomer,
+} from "../utils/customerData";
+import { formatDate } from "../utils/formatDate";
+import Alert from "../components/Alert";
 
 const HomePage = () => {
   const [customers, setCustomers] = useState([]);
@@ -13,6 +19,8 @@ const HomePage = () => {
   const [customerName, setCustomerName] = useState(null);
   const [customerId, setCustomerId] = useState(null);
   const [showModalEdit, setShowModalEdit] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -34,23 +42,32 @@ const HomePage = () => {
 
   const openModalEdit = (customer) => {
     setShowModalEdit(true);
-    const formattedDate = (date) => {
-      const [day, month, year] = date.split(".");
-      return `${year}-${month}-${day}`;
-    };
     setFormData({
       firstName: customer.name.split(" ")[0],
       lastName: customer.name.split(" ").slice(1).join(" "),
-      dateOfBirth: formattedDate(customer.dateOfBirth),
+      dateOfBirth: formatDate(customer.dateOfBirth),
       phoneNumber: customer.phoneNumber,
       email: customer.email,
       address: customer.address,
     });
+    setCustomerId(customer.id);
   };
 
   const editCustomer = (e) => {
     e.preventDefault();
-    console.log("Edit customer");
+    const customer = {
+      name: `${formData.firstName} ${formData.lastName}`,
+      dateOfBirth: formatDate(formData.dateOfBirth),
+      phoneNumber: formData.phoneNumber,
+      email: formData.email,
+      address: formData.address,
+    };
+    updateCustomer(customerId, customer, () => {
+      fetchCustomers();
+      setShowAlert(true);
+      setAlertMessage("Customer updated successfully");
+    });
+    setShowModalEdit(false);
   };
 
   const openModalRemove = (customer) => {
@@ -60,7 +77,11 @@ const HomePage = () => {
   };
 
   const removeCustomer = () => {
-    deleteCustomer(customerId, () => fetchCustomers());
+    deleteCustomer(customerId, () => {
+      fetchCustomers();
+      setShowAlert(true);
+      setAlertMessage("Customer removed successfully");
+    });
   };
 
   useEffect(() => {
@@ -104,6 +125,11 @@ const HomePage = () => {
         formData={formData}
         setFormData={setFormData}
         handleSubmit={editCustomer}
+      />
+      <Alert
+        showAlert={showAlert}
+        setShowAlert={setShowAlert}
+        alertMessage={alertMessage}
       />
     </>
   );

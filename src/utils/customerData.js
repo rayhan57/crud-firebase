@@ -21,6 +21,18 @@ export const getCustomers = async () => {
   return Object.keys(customers).map((key) => ({ ...customers[key], id: key }));
 };
 
+export const updateCustomer = async (id, customer, onSuccess) => {
+  const db = getDatabase(app);
+  const customerRef = ref(db, `customers/${id}`);
+  await set(customerRef, customer)
+    .then(() => {
+      onSuccess();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
 export const deleteCustomer = async (id, onSuccess) => {
   const db = getDatabase(app);
   const customerRef = ref(db, `customers/${id}`);
