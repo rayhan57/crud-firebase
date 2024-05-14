@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
-import ButtonCreateCustomers from "../components/ButtonCreateCustomers";
-import ConfirmModal from "../components/ConfirmModal";
+import { useParams } from "react-router-dom";
 import CustomerCard from "../components/CustomersCard";
-import EditModal from "../components/EditModal";
-import SearchCustomers from "../components/SearchCustomers";
+import { motion } from "framer-motion";
 import {
   deleteCustomer,
-  getCustomers,
+  getCustomerByName,
   updateCustomer,
 } from "../utils/customerData";
-import { formatDate } from "../utils/formatDate";
+import ConfirmModal from "../components/ConfirmModal";
+import EditModal from "../components/EditModal";
 import Alert from "../components/Alert";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { formatDate } from "../utils/formatDate";
 
-const HomePage = () => {
-  const navigate = useNavigate();
-  const [customers, setCustomers] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
+const SearchPage = () => {
+  const { searchTerm } = useParams();
+  const [customersSearch, setCustomersSearch] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [customerName, setCustomerName] = useState(null);
   const [customerId, setCustomerId] = useState(null);
@@ -34,14 +31,8 @@ const HomePage = () => {
   });
 
   const fetchCustomers = async () => {
-    const customers = await getCustomers();
-    setCustomers(customers);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!searchInput) return;
-    navigate(`/search/${searchInput}`);
+    const customers = await getCustomerByName(searchTerm);
+    setCustomersSearch(customers);
   };
 
   const openModalEdit = (customer) => {
@@ -93,38 +84,29 @@ const HomePage = () => {
   }, []);
 
   return (
-    <>
-      <div className="container mt-5 lg:mt-10">
-        <h1 className="text-center text-2xl">Customers</h1>
+    <div className="container mt-5 lg:mt-10">
+      <h1 className="text-lg lg:text-xl">
+        Search results for: <span className="font-semibold">{searchTerm}</span>
+      </h1>
 
-        <div className="mt-3 space-y-3 rounded-md bg-white p-2">
-          <ButtonCreateCustomers />
-          <SearchCustomers
-            searchInput={searchInput}
-            setSearchInput={setSearchInput}
-            handleSearch={handleSearch}
-          />
-        </div>
-
-        <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-          {customers.map((customer, index) => (
-            <motion.div
+      <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+        {customersSearch.map((customer, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: 1,
+              transition: { duration: 0.5, delay: index * 0.2 },
+            }}
+          >
+            <CustomerCard
               key={index}
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: 1,
-                transition: { duration: 0.5, delay: index * 0.2 },
-              }}
-            >
-              <CustomerCard
-                key={index}
-                customer={customer}
-                openEditModal={openModalEdit}
-                openRemoveModal={openModalRemove}
-              />
-            </motion.div>
-          ))}
-        </div>
+              customer={customer}
+              openEditModal={openModalEdit}
+              openRemoveModal={openModalRemove}
+            />
+          </motion.div>
+        ))}
       </div>
       <ConfirmModal
         show={showModal}
@@ -144,8 +126,8 @@ const HomePage = () => {
         setShowAlert={setShowAlert}
         alertMessage={alertMessage}
       />
-    </>
+    </div>
   );
 };
 
-export default HomePage;
+export default SearchPage;

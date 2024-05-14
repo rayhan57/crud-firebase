@@ -6,7 +6,7 @@ const CustomerCard = ({ customer, openEditModal, openRemoveModal }) => {
   const { name, dateOfBirth, phoneNumber, email, address } = customer;
 
   return (
-    <div className="relative rounded-md bg-white p-2">
+    <div className="relative rounded-md border bg-white p-2 hover:border-indigo-500">
       <h1 className="mb-4 text-lg font-semibold">{name}</h1>
       <div className="space-y-2">
         <p className="text-sm font-semibold lg:text-base">

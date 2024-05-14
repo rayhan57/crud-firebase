@@ -1,5 +1,6 @@
 import React from "react";
 import { PhoneInput } from "react-international-phone";
+import { motion } from "framer-motion";
 
 const EditModal = ({ show, onClose, handleSubmit, formData, setFormData }) => {
   const handleInputChange = (e) => {
@@ -11,7 +12,11 @@ const EditModal = ({ show, onClose, handleSubmit, formData, setFormData }) => {
     <>
       {show && (
         <div className="fixed inset-0 bg-black/40">
-          <div className="absolute left-1/2 top-1/2 w-96 -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-md bg-white p-4 md:h-80 lg:h-auto">
+          <motion.div
+            className="absolute left-1/2 top-1/2 w-96 -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-md bg-white p-4 md:h-80 lg:h-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
             <h1 className="text-xl lg:text-2xl">Edit Customer</h1>
 
             <form onSubmit={handleSubmit}>
@@ -105,7 +110,7 @@ const EditModal = ({ show, onClose, handleSubmit, formData, setFormData }) => {
                 </button>
               </div>
             </form>
-          </div>
+          </motion.div>
         </div>
       )}
     </>
