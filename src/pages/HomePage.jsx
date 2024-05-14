@@ -40,7 +40,7 @@ const HomePage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!searchInput) return;
+    if (!searchInput.trim()) return;
     navigate(`/search/${searchInput}`);
   };
 
